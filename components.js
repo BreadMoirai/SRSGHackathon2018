@@ -25,12 +25,23 @@ class Gravity {
 	}
 }
 
-class Acceleration {
-	constructor(timeTillMax, maxAccel) {
-		this.x = 0;
-		this.y = 0;
-		this.step = 0;
-		this.maxTime = timeTillMax;
-		this.maxAccel = maxAccel;
+class Weight {
+	constructor(weight) {
+		this.weight = weight;
+	}
+}
+
+class LifeSpan {
+	constructor(endTime) {
+		this.life = 0;
+		this.endTime = endTime;
+	}
+}
+
+class Color {
+	constructor(r, g, b) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
 	}
 }

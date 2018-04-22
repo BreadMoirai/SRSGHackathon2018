@@ -6,14 +6,9 @@ class PhysicsSystem {
 			var vel = e.getComp(Velocity);
 			var size = e.getComp(Size);
 			var grav = e.getComp(Gravity);
-			var accel = e.getComp(Acceleration);
 			if (pos != null && vel != null) {
 				pos.x += vel.x;
 				pos.y += vel.y;
-			}
-			if (vel && accel) {
-				vel.x += accel.x;
-				vel.y += accel.y;
 			}
 			if (vel != null && grav != null) {
 				if (size != null) {
@@ -36,7 +31,11 @@ class PhysicsSystem {
 	}
 }
 
-
+function easeOutCubic(t, b, c, d) {
+	t /= d;
+	t--;
+	return c*(t*t*t + 1) + b;
+}
 
 class PlayerSystem {
 	constructor(person) {
@@ -46,23 +45,13 @@ class PlayerSystem {
 	}
 
 	process(entities, deltaTime) {
-		var a = this.person.getComp(Acceleration);
-		if (this.left && this.right) {
-			return;
+		var v = this.person.getComp(Velocity);
+		if (this.left == this.right) {
+			v.x /= 1.1;
+		} else if (this.left) {
+			v.x = -5;
 		} else if (this.right) {
-			if (a.maxAccel - a.x < .0001) {
-				return;
-			}
-			if (a.x < 0) {
-				a.x = 0;
-				a.step = 0;
-			}
-			var t = a.step + deltaTime;
-			var c = a.maxTime;
-			var d = a.maxAccel;
-			var td = t / d;
-			a.x -= c*t*t*t*t;
-			a.step = t;
+			v.x = 5;
 		}
 	}
 
@@ -70,7 +59,6 @@ class PlayerSystem {
 		var v = this.person.getComp(Velocity);
 		var size = this.person.getComp(Size);
 		var pos = this.person.getComp(Position);
-		var a = this.person.getComp(Acceleration);
 		switch(keyCode) {
 			case LEFT_ARROW:
 				this.left = true;
@@ -80,7 +68,7 @@ class PlayerSystem {
 				break;
 			case 32:
 				if (pos.y + size.y/2 >= ground) {
-					v.y -= 50;
+					v.y -= 20;
 				}
 				break;
 		}
@@ -106,12 +94,7 @@ class DrawSystem {
 			var size = e.getComp(Size);
 			if (pos != null && size != null) {
 				entities[i].draw(pos.x, pos.y, size.x, size.y);	
-			} else if (pos != null) {
-				entities[i].draw(pos.x, pos.y);
-			} else {
-				entities[i].draw();
 			}
-
 		}
 	}
 }
@@ -126,3 +109,59 @@ class LifeSystem {
 		}
 	}
 }
+
+class CollisionSystem {
+	process(entities, deltaTime) {
+		var collidables = entities.filter(e => e instanceof Obstacle);
+		var player = entities.find(e => e instanceof Person);
+		var pPos = player.getComp(Position);
+		var pSize = player.getComp(Size);
+		for (var i = 0; i < collidables.length; i++) {
+			var r = collidables[i];
+			var rPos = r.getComp(Position);
+			var rSize = r.getComp(Size);
+			// does it collide?
+
+			if (collideRectCircle(rPos.x - rSize.x/2, rPos.y - rSize.y/2, rSize.x, rSize.y, pPos.x, pPos.y, pSize.x)) {
+				for (var i = 0; i < 10; i++) {
+					entities.push(new Particle(pPos.x, pPos.y));
+				}
+				gameEnd();
+			}	
+		}
+	}
+}
+
+class ParticleSystem {
+	process(entities, deltaTime) {
+		var particles = entities.filter(e => e instanceof Particle);
+		for (var i = 0; i < particles.length; i++) {
+			var l = particles[i].getComp(LifeSpan);
+			if (l.life++ > l.endTime) {
+				entities.splice(entities.indexOf(particles[i]), 1);
+			}
+		}
+	}
+}
+
+class Particle extends Entity {
+	constructor(x, y) {
+		super();
+		this.addComp(new Color(random(255), random(255), random(255)));
+		this.addComp(new Position(x, y));
+		var s = random(300);
+		this.addComp(new Size(s, s));
+		this.addComp(new LifeSpan(30));
+		this.addComp(new Velocity(random(5) - 2.5, random(5) - 2.5));
+	}
+
+	draw(x, y) {
+		var s = this.getComp(Size);
+		var c = this.getComp(Color);
+		var p = this.getComp(Position);
+		var l = this.getComp(LifeSpan);
+		fill(color(c.r, c.g, c.b));
+		ellipse(p.x, p.y, s.x * l.life/l.endTime);
+	}
+}
+
