@@ -1,17 +1,29 @@
 class Obstacle extends Entity{
 	constructor() {
-		super(1200, 700, 20, random(xDim/4)); 
-		//xPos, yPos, width, height
-		this.xVel = 10;
+		super();
+		var height = random(xDim/4);
+		this.addComp(new Size(20, height));
+		this.addComp(new Position(xDim + 10, ground - height/2));
+		this.addComp(new Velocity(-5, 0));
 	}
 
-	draw(){
-		rect(this.xPos, this.yPos, this.width, this.height);
+	draw(x, y, w, h){
+		var v = this.getComp(Velocity)
+		rect(x - w/2, y - h/2, w, h);
 		fill(255);
 	}
 
-	update() {
-		this.xPos -= this.xVel;
-	}
+}
 
+class ObstacleSpawnSystem {
+	constructor() {
+		this.counter = 0;
+	}
+	process(entities, deltaTime) {
+		if (this.counter%50 == 0) {
+			entities.push(new Obstacle())
+		}
+
+		this.counter++;
+	}
 }
