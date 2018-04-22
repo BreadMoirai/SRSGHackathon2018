@@ -100,13 +100,20 @@ class DrawSystem {
 }
 
 class LifeSystem {
+	constructor() {
+		this.score = 0;
+	}
 	process(entities, deltaTime) {
 		for (var i = 0; i < entities.length; i++) {
-			if (entities[i].isDead()) {
+			if (entities[i].getComp(Position).x < 0) {
 				entities.splice(i, 1);
 				i--;
+				this.score++;
 			}
-		}
+		}	
+		fill(10, 145, 155);
+		textSize(50);
+		text(this.score, xDim - 100, 100);
 	}
 }
 
@@ -123,9 +130,9 @@ class CollisionSystem {
 			// does it collide?
 
 			if (collideRectCircle(rPos.x - rSize.x/2, rPos.y - rSize.y/2, rSize.x, rSize.y, pPos.x, pPos.y, pSize.x)) {
-				for (var i = 0; i < 10; i++) {
-					entities.push(new Particle(pPos.x, pPos.y));
-				}
+				// for (var i = 0; i < 10; i++) {
+				// 	entities.push(new Particle(pPos.x, pPos.y));
+				// }
 				gameEnd();
 			}	
 		}

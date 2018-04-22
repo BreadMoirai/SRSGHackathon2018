@@ -1,5 +1,6 @@
 var entities = [];
 var systems = [];
+var life;
 var canvas;
 var person1;
 var playerSystem;
@@ -14,11 +15,6 @@ function preload() {
 
 function setup(){
 	canvas = createCanvas(xDim,yDim);
-	  colorMode(HSB, 360, 100, 100);
-  noStroke();
-  ellipseMode(RADIUS);
-  frameRate(1);
-	frameRate(60);
 
 	person1 = new Person();
 	playerSystem = new PlayerSystem(person1);
@@ -27,13 +23,14 @@ function setup(){
 	systems.push(new PhysicsSystem());
 	systems.push(new DrawSystem());
 	systems.push(new ObstacleSpawnSystem());
-	systems.push(new LifeSystem());
+	life = new LifeSystem();
+	systems.push(life);
 	systems.push(new CollisionSystem());
 
 	entities.push(person1);
 
 	// mysound.setVolume(.3);
- //    mysound.play();
+ 	// mysound.play();
 }
 
 function draw(){
@@ -55,12 +52,14 @@ function keyReleased(){
 
 var gameEnd = function gameOver()
 {
-	
+
 	background('#000000');
+	fill(10, 145, 155);
 	textSize(48);
 	textStyle(BOLD);
-	fill(122, 29, 29)
-	text('Game Over', xDim/2 , yDim/2);
+	stroke(5);
+	text('Game Over.\nPress F5 to reload\nSCORE: ' + life.score, xDim/2 - 100 , yDim/2);
+	noLoop();
 }
 
 

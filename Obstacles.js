@@ -10,8 +10,8 @@ class Obstacle extends Entity{
 
 	draw(x, y, w, h){
 		var v = this.getComp(Velocity)
+		fill(10, 145, 155);
 		rect(x - w/2, y - h/2, w, h);
-		fill(255);
 	}
 
 }
