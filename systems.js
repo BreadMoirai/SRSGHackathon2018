@@ -105,6 +105,7 @@ class LifeSystem {
 	}
 	process(entities, deltaTime) {
 		for (var i = 0; i < entities.length; i++) {
+			if (entities[i] instanceof Person) continue;
 			if (entities[i].getComp(Position).x < 0) {
 				entities.splice(i, 1);
 				i--;

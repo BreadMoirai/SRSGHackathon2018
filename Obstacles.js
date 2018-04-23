@@ -1,11 +1,11 @@
 class Obstacle extends Entity{
-	constructor() {
+	constructor(v) {
 		super();
 		var height = random(xDim/10, xDim/7);
 		var length = random(20, 50)
 		this.addComp(new Size(length, height));
 		this.addComp(new Position(xDim + 10, ground - height/2));
-		this.addComp(new Velocity(-5, 0));
+		this.addComp(new Velocity(v, 0));
 	}
 
 	draw(x, y, w, h){
@@ -27,7 +27,11 @@ class ObstacleSpawnSystem {
 		{
 			var randomNumber = random();
 			if (randomNumber > .95) {
-				entities.push(new Obstacle());
+				if (life.score > 10) {
+					entities.push(new Obstacle(random(5)-10));
+				} else {
+				entities.push(new Obstacle(random(3)-6));
+					}
 				this.minCreationTime = this.newMinCreationTime;
 				var randomNum = random(1, 100)
 				if (random > 80)
